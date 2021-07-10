@@ -47,6 +47,23 @@ class BookStoreTests {
 	}
 	
 	@Test
+	void testEditBook() {
+		ResponseEntity<?> response = controller.add(getBook());
+		Book book = (Book) response.getBody();
+		book.setPrice(99);
+		Book responseBook  = (Book) controller.edit(book).getBody();
+		assertEquals(99.0, responseBook.getPrice());
+	}
+	
+	@Test
+	void testDeleteBook() {
+		ResponseEntity<?> response = controller.add(getBook());
+		Book book = (Book) response.getBody();
+		response  = controller.delete(""+ book.getId());
+		assertEquals("Book deleted.", response.getBody());
+	}
+	
+	@Test
 	void testAddBookMissingData() {
 
 		ResponseEntity<?> response = controller.add(new Book());
