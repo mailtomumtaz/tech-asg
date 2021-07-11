@@ -19,6 +19,7 @@ import com.tech.devapp.controller.BookController;
 import com.tech.devapp.controller.VoucherController;
 import com.tech.devapp.entities.Voucher;
 import com.tech.devapp.model.Book;
+import com.tech.devapp.model.wrapper.BookList;
 import com.tech.devapp.services.VoucherService;
 
 /**
@@ -63,6 +64,7 @@ class BookStoreTests {
 		assertEquals("Book deleted.", response.getBody());
 	}
 	
+	
 	@Test
 	void testAddBookMissingData() {
 
@@ -75,7 +77,12 @@ class BookStoreTests {
 		List<Book> bookWithIds = getBookList();
 		bookWithIds.add((Book) controller.add(getBookWithDiscount()).getBody());
 		
-		ResponseEntity<?> response = controller.checkout(bookWithIds, "");
+		BookList bookList = BookList.builder()
+				.bookList(bookWithIds)
+				.voucher("")
+				.build();
+		
+		ResponseEntity<?> response = controller.checkout(bookList);
 		assertEquals("450.0", response.getBody());
 		
 	}
@@ -85,7 +92,12 @@ class BookStoreTests {
 		List<Book> bookWithIds = getBookList();
 		bookWithIds.add((Book) controller.add(getBookWithoutDiscount()).getBody());
 		
-		ResponseEntity<?> response = controller.checkout(bookWithIds, "");
+		BookList bookList = BookList.builder()
+				.bookList(bookWithIds)
+				.voucher("")
+				.build();
+		
+		ResponseEntity<?> response = controller.checkout(bookList);
 		assertEquals("50.0", response.getBody());
 		
 	}
@@ -93,12 +105,18 @@ class BookStoreTests {
 	@Test
 	void testCheckoutWithoutVoucher() {
 		
+		
 		List<Book> bookWithIds = new ArrayList<>();
 		List<Book> books = getBookList();
 		for(Book book : books) {
 			bookWithIds.add((Book) controller.add(book).getBody());
 		}
-		ResponseEntity<?> response = controller.checkout(bookWithIds, "");
+		BookList bookList = BookList.builder()
+				.bookList(bookWithIds)
+				.voucher("")
+				.build();
+		
+		ResponseEntity<?> response = controller.checkout(bookList);
 		assertEquals("280.0", response.getBody());
 	}
 
@@ -110,9 +128,14 @@ class BookStoreTests {
 		for(Book book : books) {
 			bookWithIds.add((Book) controller.add(book).getBody());
 		}
-		
+
 		String code = voucherController.addVoucher(30).getBody().toString();
-		ResponseEntity<?> response = controller.checkout(bookWithIds, code);
+		BookList bookList = BookList.builder()
+				.bookList(bookWithIds)
+				.voucher(code)
+				.build();
+		
+		ResponseEntity<?> response = controller.checkout(bookList);
 		assertEquals("250.0", response.getBody());
 	}
 	

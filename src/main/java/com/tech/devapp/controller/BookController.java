@@ -65,20 +65,19 @@ public class BookController {
 	}
 	
 	@PostMapping("/checkout")
-	public ResponseEntity<?> checkout(@RequestBody List<Book> bookList,
-									   @RequestBody String voucher) {
+	public ResponseEntity<?> checkout(@RequestBody BookList book) {
 		
-		if(bookList == null) {
+		if(book == null || book.getBookList().size() == 0) {
 			return new ResponseEntity<>("Books required.", HttpStatus.BAD_REQUEST);
 		}
 		else
 		{
-			List<Long> ids = bookList.stream().map(b -> b.getId()).collect(Collectors.toList());
+			List<Long> ids = book.getBookList().stream().map(b -> b.getId()).collect(Collectors.toList());
 			List<com.tech.devapp.entities.Book> books = bookService.getBooksByListId(ids);
 			
 			CheckoutCalculator calculator = new CheckoutCalculator(comicBook, fictionBook);
-			double totamAmount = calculator.calculateTotal(books, getVoucherAmount(voucher));
-			voucherService.expireVoucher(voucher);
+			double totamAmount = calculator.calculateTotal(books, getVoucherAmount(book.getVoucher()));
+			voucherService.expireVoucher(book.getVoucher());
 			return new ResponseEntity<>(""+totamAmount, HttpStatus.OK);
 		}
 	}
