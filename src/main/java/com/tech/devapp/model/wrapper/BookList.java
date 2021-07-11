@@ -26,8 +26,11 @@ import lombok.ToString;
 @Builder
 public class BookList {
 
-	@JsonProperty("books")
+	@JsonProperty("bookList")
 	private List<Book> bookList;
+	
+	@JsonProperty("voucher")
+	private String voucher;
 	
 	public BookList() {
 		bookList = new ArrayList<>();
